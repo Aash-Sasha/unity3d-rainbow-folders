@@ -23,5 +23,6 @@ namespace Borodar.RainbowFolders.Editor.Settings
         public string Name;
         public Texture2D SmallIcon;
         public Texture2D LargeIcon;
+        public bool IsRecursive;
     }
 }

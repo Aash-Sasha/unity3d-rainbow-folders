@@ -15,7 +15,10 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Borodar.RainbowFolders.Utils;
+using UnityEditor;
 
 namespace Borodar.RainbowFolders.Editor.Settings
 {
@@ -24,6 +27,8 @@ namespace Borodar.RainbowFolders.Editor.Settings
         public const string RESOURCE_NAME = "RainbowFoldersSettings";
 
         public List<RainbowFolder> Folders;
+
+        private Dictionary<string, RainbowFolder> _recursiveIconsCache = new Dictionary<string, RainbowFolder>();
 
         public static RainbowFoldersSettings Load()
         {
@@ -36,19 +41,41 @@ namespace Borodar.RainbowFolders.Editor.Settings
             return settings;
         }
 
-        public Texture2D GetTextureByFolderName(string folderName, bool small = true)
+        public Texture2D GetTextureByFolderName(string path, bool small = true)
         {
-            if (IsNullOrEmpty(Folders)) return null;
+            var cachedIcon = GetFromRecursiveCache(path, small);
+            if (cachedIcon != null) return cachedIcon;
 
+            var folderName = Path.GetFileName(path);
             var folder = Folders.FirstOrDefault(x => x.Name.Equals(folderName));
+
             if (folder == null) return null;
+
+            CacheIfRecursive(path, folder);
 
             return small ? folder.SmallIcon : folder.LargeIcon;
         }
 
-        private static bool IsNullOrEmpty(ICollection collection)
+        private Texture2D GetFromRecursiveCache(string path, bool small = true)
         {
-            return collection == null || (collection.Count == 0);
+            if (_recursiveIconsCache.ContainsKey(path))
+            {
+                return small ? _recursiveIconsCache[path].SmallIcon : _recursiveIconsCache[path].LargeIcon;
+            }
+            return null;
+        }
+
+        private void CacheIfRecursive(string fullDirPath, RainbowFolder folder)
+        {
+            if (!folder.IsRecursive) return;
+
+            var subdirectories = RainbowUtils.GetSubdirectories(fullDirPath).ToList();
+            subdirectories.ForEach(x => _recursiveIconsCache[x] = folder);
+        }
+
+        public void ClearRecursiveIconsCache()
+        {
+            _recursiveIconsCache = new Dictionary<string, RainbowFolder>();
         }
     }
 }

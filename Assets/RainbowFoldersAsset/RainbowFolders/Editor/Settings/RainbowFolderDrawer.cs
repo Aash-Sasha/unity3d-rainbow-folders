@@ -22,7 +22,7 @@ namespace Borodar.RainbowFolders.Editor.Settings
     {
         private const float PADDING = 8f;
         private const float LINE_HEIGHT = 16f;
-        private const float LABELS_WIDTH = 100f;
+        private const float LABELS_WIDTH = 128f;
         private const float PREVIEW_SIZE_SMALL = 16f;
         private const float PREVIEW_SIZE_LARGE = 64f;
 
@@ -33,6 +33,7 @@ namespace Borodar.RainbowFolders.Editor.Settings
             var folderName = property.FindPropertyRelative("Name");
             var smallIcon = property.FindPropertyRelative("SmallIcon");
             var largeIcon = property.FindPropertyRelative("LargeIcon");
+            var isRecursive = property.FindPropertyRelative("IsRecursive");
 
             // Labels
 
@@ -45,9 +46,10 @@ namespace Borodar.RainbowFolders.Editor.Settings
             EditorGUI.LabelField(position, "Small Icon");
             position.y += LINE_HEIGHT;
             EditorGUI.LabelField(position, "Large Icon");
+            position.y += LINE_HEIGHT;
+            EditorGUI.LabelField(position, "Change Recursively?");
 
             // Values
-
             position.x += LABELS_WIDTH;
             position.y = originalPosition.y + PADDING;
             position.width = originalPosition.width - LABELS_WIDTH - PREVIEW_SIZE_LARGE - PADDING;
@@ -57,7 +59,8 @@ namespace Borodar.RainbowFolders.Editor.Settings
             EditorGUI.PropertyField(position, smallIcon, GUIContent.none);
             position.y += LINE_HEIGHT;
             EditorGUI.PropertyField(position, largeIcon, GUIContent.none);
-
+            position.y += LINE_HEIGHT;
+            EditorGUI.PropertyField(position, isRecursive, GUIContent.none);
             // Preview
 
             position.x += position.width + PADDING;
@@ -72,7 +75,7 @@ namespace Borodar.RainbowFolders.Editor.Settings
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return PREVIEW_SIZE_LARGE;
+            return PREVIEW_SIZE_LARGE + LINE_HEIGHT;
         }
 
         private static Texture2D GetDefaultFolderIcon()

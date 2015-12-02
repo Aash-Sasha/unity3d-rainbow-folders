@@ -12,8 +12,12 @@
  * the License.
  */
 
+using System.Collections.Generic;
+using System.Linq;
+using Borodar.RainbowFolders.Utils;
 using Rotorz.ReorderableList;
 using UnityEditor;
+using UnityEngine;
 
 namespace Borodar.RainbowFolders.Editor.Settings
 {
@@ -23,10 +27,12 @@ namespace Borodar.RainbowFolders.Editor.Settings
         private const string PROP_NAME_FOLDERS = "Folders";
 
         private SerializedProperty _foldersProperty;
+        private RainbowFoldersSettings _settings;
 
         protected void OnEnable()
         {
             _foldersProperty = serializedObject.FindProperty(PROP_NAME_FOLDERS);
+            _settings = (RainbowFoldersSettings) target;
         }
 
         public override void OnInspectorGUI()
@@ -34,10 +40,19 @@ namespace Borodar.RainbowFolders.Editor.Settings
             EditorGUILayout.HelpBox("Please set your icons for folder names here", MessageType.Info);
 
             serializedObject.Update();
-            ReorderableListGUI.Title("Rainbow Folders");
-            ReorderableListGUI.ListField(_foldersProperty);
+            DrawFoldersList();
             serializedObject.ApplyModifiedProperties();
         }
 
+        private void DrawFoldersList()
+        {
+            EditorGUI.BeginChangeCheck();
+            ReorderableListGUI.Title("Rainbow Folders");
+            ReorderableListGUI.ListField(_foldersProperty);
+            if (EditorGUI.EndChangeCheck())
+            {
+                _settings.ClearRecursiveIconsCache();
+            }
+        }
     }
 }
